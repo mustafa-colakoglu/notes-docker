@@ -1,7 +1,36 @@
-# Is Docker Right For You?
+# Notes - Docker
+
+- [Notes - Docker](#notes---docker)
+  - [Docker's biggest wins](#dockers-biggest-wins)
+  - [Docker vs Others](#docker-vs-others)
+- [Understanding Docker](#understanding-docker)
+  - [Virtual Machines vs Docker Containers](#virtual-machines-vs-docker-containers)
+    - [Analogy](#analogy)
+  - [VMs vs. Docker containers in the real world!](#vms-vs-docker-containers-in-the-real-world)
+  - [Visualizing Docker's architecture](#visualizing-dockers-architecture)
+- [Installing Docker](#installing-docker)
+  - [Docker Community Edition vs. Docker EE](#docker-community-edition-vs-docker-ee)
+  - [Docker toolbox vs. Docker for Mac/Windows](#docker-toolbox-vs-docker-for-macwindows)
+  - [Verifying you have Docker installed](#verifying-you-have-docker-installed)
+- [Discovering Docker](#discovering-docker)
+  - [Hello world with Docker](#hello-world-with-docker)
+  - [Docker Images and Containers](#docker-images-and-containers)
+  - [Downloading and Storing Docker Images](#downloading-and-storing-docker-images)
+  - [Explaining the Docker Build Process](#explaining-the-docker-build-process)
+- [Docker in the Real World](#docker-in-the-real-world)
+  - [Creating a Dockerfile](#creating-a-dockerfile)
+  - [Building and pushing Docker images](#building-and-pushing-docker-images)
+  - [Running Docker containers](#running-docker-containers)
+  - [Live code loading with volumes](#live-code-loading-with-volumes)
+  - [Debugging tips and tricks](#debugging-tips-and-tricks)
+  - [Linking containers with Docker networks](#linking-containers-with-docker-networks)
+  - [Persisting data to your Docker host](#persisting-data-to-your-docker-host)
+  - [Sharing data between containers](#sharing-data-between-containers)
+  - [Optimizing your Docker images](#optimizing-your-docker-images)
+  - [Running scripts when a container starts](#running-scripts-when-a-container-starts)
+  - [Cleaning up after yourself](#cleaning-up-after-yourself)
 
 ## Docker's biggest wins
------------------------------
 
 - Saving time and money.
 - VMs waste lots of resources (like Vagrant).
@@ -14,7 +43,6 @@
 - Prevents setup burden of languages and tools.
 
 ## Docker vs Others
---------------------------------------
 
 - VMs create isolated environments, but they are slow and not efficient.
 - Then LXC came into the action. The problem with LXCs is, they are tough to use, because they are complicated.
@@ -22,7 +50,6 @@
 # Understanding Docker
 
 ## Virtual Machines vs Docker Containers
----------------------------------------------
 
 - Docker containers are not VMs. Think of containers as isolated processes.
 - To be able to run a VM on a server:
@@ -57,7 +84,6 @@
 - Docker containers are apartments. Apartments also provide privacy, and you will have your space, but you will be using a shared infrastructure. Each apartment building is using shared plumbing, heating, electrical systems etc. Apartments maximize alternatives for your size needs, you can buy a huge apartment or a very small one.
 
 ## VMs vs. Docker containers in the real world!
-----------------------------------------------------
 
 - Cloud hosting providers use VMs. Hardware constraints tied into your plan.
 
@@ -67,7 +93,6 @@
 
 
 ## Visualizing Docker's architecture
------------------------------------------
 
 - `docker daemon` is the server that runs on host operating system. It only runs on Linux, because it depends on Linux kernel features.
 
@@ -82,7 +107,6 @@
 # Installing Docker
 
 ## Docker Community Edition vs. Docker EE
-----------------------------------------------
 
 - Docker CE is production ready. Docker EE is for mission critical apps.
 
@@ -107,7 +131,6 @@
 - Versioning scheme is structured with date. For example `17.03` means 2017 March.
 
 ## Docker toolbox vs. Docker for Mac/Windows
--------------------------------------------------
 
 Docker toolbox installs:
   - Docker CE/EE
@@ -141,7 +164,6 @@ Docker for Mac/Windows installs:
   - You can use any terminal you want.
 
 ## Verifying you have Docker installed
--------------------------------------------
 
 - Check docker:
 
@@ -158,7 +180,6 @@ Docker for Mac/Windows installs:
 # Discovering Docker
 
 ## Hello world with Docker
--------------------------------
 
 ```bash
 docker run hello-world
@@ -181,7 +202,6 @@ docker run -it alpine ls /var
 ```
 
 ## Docker Images and Containers
-------------------------------------
 
 A docker image is a combination of a file system and parameters. A docker image doesn't have any state attached to it, and once built it never changes. A docker image is something that you can download, build and run.
 
@@ -202,7 +222,6 @@ exit # file is gone forever
 If we open two different terminals, and type `docker run -it alpine sh` in both of them, this two containers will be independent and will not effect each others. When you create a file in one of them, the other container will not be able to see it.
 
 ## Downloading and Storing Docker Images
----------------------------------------------
 
 DockerHub is a docker registry. It's a place where you can store your images. It's like Github, but for docker images.
 
@@ -211,7 +230,6 @@ docker run docker.io/library/hello-world
 ```
 
 ## Explaining the Docker Build Process
--------------------------------------------
 
 There are 2 ways to build a docker image:
 
@@ -227,7 +245,6 @@ Docker only pulls parts that has changed. So, when we update our docker image, i
 # Docker in the Real World
 
 ## Creating a Dockerfile
---------------------------------------
 
 Docker images are basically stack of layers and Dockerfile is just a recipe.
 
@@ -298,7 +315,6 @@ CMD bundle exec rails server -b "0.0.0.0" -p 3000
 ```
 
 ## Building and pushing Docker images
-------------------------------------------
 
 Get help:
 
@@ -369,7 +385,6 @@ docker pull msdundar/deeplinks_resolver
 ```
 
 ## Running Docker containers
----------------------------------
 
 List all running containers:
 
@@ -462,7 +477,6 @@ docker container run -it -p 3000:3000 --restart on-failure --name my_container_1
 > We can't use `-rm` and `--restart` flags together.
 
 ## Live code loading with volumes
---------------------------------------
 
 To follow code changes directly in our container we can use volumes. To be able to use volumes with our container `-v` flag comes into play.
 
@@ -473,7 +487,6 @@ docker container run -it -p 3001:3001 --rm --name my_container_2 -d -v "$PWD:/ap
 This will take everything from our working directory to the running container. It's also possible to pass multiple volume commands.
 
 ## Debugging tips and tricks
----------------------------------
 
 Interact with a running container:
 
@@ -502,7 +515,6 @@ docker container exec -it my_container_1 --user "$(id -u):$(id -g)" touch foo.tx
 `id -u` will get user ID. `id -g` will get group id.
 
 ## Linking containers with Docker networks
------------------------------------------------
 
 Lets create another image:
 
@@ -573,7 +585,6 @@ docker exec deeplinks_resolver ping redis
 ```
 
 ## Persisting data to your Docker host
---------------------------------------------
 
 We will lose data generated by our app when we stop the container. We can create named volumes to persist data, and use container with databases etc.
 
@@ -604,7 +615,6 @@ docker container run --rm -itd -p 3000:3000 --name deeplinks_resolver --net firs
 Normally containers supposed to be stateless and portable! Therefore we shouldn't be storing anything in our container. But databases are an exception to this.
 
 ## Sharing data between containers
-----------------------------------------
 
 We can expose any folder as a volume like this:
 
@@ -634,7 +644,6 @@ ls /app/public
 > You can see the changes immediately in volumes!
 
 ## Optimizing your Docker images
---------------------------------------
 
 If we have a `.dockerignore` file exists, during `COPY/ADD` instructions, Docker is going to remove files matching pattern defined in this file. If we have `WORKDIR` set, ignoring will start from this folder.
 
@@ -675,7 +684,6 @@ CMD flask run --host=0.0.0.0 --port=5000
 ```
 
 ## Running scripts when a container starts
-------------------------------------------------
 
 `ENTRYPOINT [""]` declaration allows you to run a script, after your docker container starts.
 
@@ -710,7 +718,6 @@ Default `ENTRYPOINT` for `alpine` image is `/bin/sh -c`. We are overriding this 
 etc. like tasks that has to be run after we start the container.
 
 ## Cleaning up after yourself
------------------------------------
 
 Show general status of Docker on your system:
 
