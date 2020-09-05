@@ -1,16 +1,232 @@
-# Chapter 6: Docker in the Real World
+# Is Docker Right For You?
 
-## 6.1. Introduction
---------------------
+## Docker's biggest wins
+-----------------------------
 
-Nothing important in this chapter.
+- Saving time and money.
+- VMs waste lots of resources (like Vagrant).
+- Each Vagrantbox is huge, around 700mb-1GB. So we need lots of spaces for each project.
+- Docker is 10x efficient than Vagrant when it comes to disk space.
+- Prevents 'it works on my machine' issues.
+- Prevents problems like dependency version mismatch.
+- Docker runs your apps in a controlled environment.
+- Keeps your system nice and clean.
+- Prevents setup burden of languages and tools.
 
-## 6.2. A simple web-application with Docker
---------------------------------------------
+## Docker vs Others
+--------------------------------------
 
-Nothing important in this chapter.
+- VMs create isolated environments, but they are slow and not efficient.
+- Then LXC came into the action. The problem with LXCs is, they are tough to use, because they are complicated.
 
-## 6.3. Creating a Dockerfile (Part 1)
+# Understanding Docker
+
+## Virtual Machines vs Docker Containers
+---------------------------------------------
+
+- Docker containers are not VMs. Think of containers as isolated processes.
+- To be able to run a VM on a server:
+  - We need an infrastructure
+  - Then a host operating system
+  - Hypervisor to run VMs on this operating system. There are two types of hypervisors:
+    - Type 1: Direct link to the infrastructure, such as HyperKit (OSx), Hyper-V (Windows) and KVM (Linux)
+    - Type 2: Runs as an app on the host OS: VirtualBox/VMWare
+  - On top of hypervisor, we will have different guest operating systems. The problem is all these guestOSs occupies space on our disk, uses CPU and memory resources.
+  - On top of GuestOS, we will have our binaries and libraries.
+  - Then there will be our apps on top of everything.
+
+- To be able to run a docker container on a server:
+  - We need an infrastructure
+  - Then a host operating system
+  - Docker deamon (replaces hypervisor)
+  - Our binaries and libraries
+  - Then there will be our apps on top of everything.
+
+- In summary:
+
+  ![vm-vs-docker](images/ch3-vm-vs-docker.png)
+
+- Both have advantages and disadvantages.
+- VMs are good for isolating systems.
+- Docker containers are good for isolating applications.
+
+### Analogy
+
+- VMs are like houses. Houses (VMs) are fully self-contained. They have their own infrastructure like plumbing, heating, electrical systems and so on. On the other hand, most houses include a bedroom, bathroom, living room and additional rooms. If you only need an area to sleep and poop, you will probably end up by buying what you need because that's how houses are built.
+
+- Docker containers are apartments. Apartments also provide privacy, and you will have your space, but you will be using a shared infrastructure. Each apartment building is using shared plumbing, heating, electrical systems etc. Apartments maximize alternatives for your size needs, you can buy a huge apartment or a very small one.
+
+## VMs vs. Docker containers in the real world!
+----------------------------------------------------
+
+- Cloud hosting providers use VMs. Hardware constraints tied into your plan.
+
+- Docker can run on dedicated hardware (bare-matel) too!
+
+- Build once deploy everywhere is the whole point.
+
+
+## Visualizing Docker's architecture
+-----------------------------------------
+
+- `docker daemon` is the server that runs on host operating system. It only runs on Linux, because it depends on Linux kernel features.
+
+- `docker daemon` exposes a REST API for the clients. One of the most popular clients communicating with daemon is `docker cli`. When you install docker, you get daemon and cli together.
+
+  ![docker-architecture](images/ch3-docker-architecture.png)
+
+- You can use the client to manage many components of docker, like containers, images and networks.
+
+  ![docker-high-level-overview](images/ch3-high-level-overview.png)
+
+# Installing Docker
+
+## Docker Community Edition vs. Docker EE
+----------------------------------------------
+
+- Docker CE is production ready. Docker EE is for mission critical apps.
+
+- Docker EE provides:
+
+  - Certified images and plugins
+  - Vulnerability scans
+  - Access to Docker datacenter
+  - Official support
+
+- Prices range 750$ to 2000$ per year.
+
+- Docker CE edition comes with two release channels:
+
+  - Edge channel: Released each month. Getting updates at the same month.
+  - Stable channel: Released every 4 months. Each release is supported for 4 months.
+
+- Docker EE releases are every 3 months. Each release is supported for 12 months.
+
+  ![docker-releases](images/ch4-docker-releases.png)
+
+- Versioning scheme is structured with date. For example `17.03` means 2017 March.
+
+## Docker toolbox vs. Docker for Mac/Windows
+-------------------------------------------------
+
+Docker toolbox installs:
+  - Docker CE/EE
+  - Docker Compose
+  - Docker Machine
+  - VirtualBox
+  - Docker QuickStart Terminal
+  - Kitematic
+
+Since the `docker-daemon` requires Linux, and OSx and Windows are not running Linux you need some way to load up Linux in OSx and Windows. Here VirtualBox comes into the action. Remember, VirtualBox is a type-2 hypervisor. `docker machine` helps you create servers and install docker. It's a command line tool. Docker machine can be used locally in cloud.
+
+- Docker for Mac/Windows is a newer tool than Docker toolbox, and is the prefered way. No VirtualBox is required for Docker for Mac/Windows because it uses the type-1 hypervisor (OSx: Hyper-Kit, Windows: Hyper-V).
+
+Docker for Mac/Windows installs:
+  - Docker CE/EE
+  - Docker Compose
+  - Docker Machine
+
+**Docker Toolbox vs. Docker for Mac/Windows**
+
+- Docker Toolbox (with type2 hypervisor, virtualbox):
+  - Requires Windows 7+ or Mountain Lion 10.8+, and Windows home version is ok.
+  - Works on older hardware
+  - Docker daemon is running on remote. Ie: access 192.168.99.100 etc.
+  - You have to use `docker quick start terminal`.
+
+- Docker for Mac/Windows (with type1 hypervisor, natively, without VirtualBox):
+  - Requires Win 10 (Pro, Ent, Stu) or Yosemite 10.10.3+
+  - Requires hardware never than 2010
+  - Docker daemon is running locally. Ie. access localhost
+  - You can use any terminal you want.
+
+## Verifying you have Docker installed
+-------------------------------------------
+
+- Check docker:
+
+  ```bash
+  docker info
+  ```
+
+- Check docker-compose:
+
+  ```bash
+  docker-compose --version
+  ```
+
+# Discovering Docker
+
+## Hello world with Docker
+-------------------------------
+
+```bash
+docker run hello-world
+# => hello world!
+```
+
+To generate this message, Docker took the following steps:
+
+1. The Docker client contacted the Docker daemon.
+2. The Docker daemon pulled the `hello-world` image from the Docker Hub (amd64)
+3. The Docker daemon created a new container from that image which runs the executable that produces the output you are currently reading.
+4. The Docker daemon streamed that output to the Docker client, which sent it to your terminal.
+
+Lets play a little bit:
+
+```bash
+docker run -it ubuntu bash
+docker run -it alpine sh
+docker run -it alpine ls /var
+```
+
+## Docker Images and Containers
+------------------------------------
+
+A docker image is a combination of a file system and parameters. A docker image doesn't have any state attached to it, and once built it never changes. A docker image is something that you can download, build and run.
+
+Container is the running version of an image. Analogy:
+
+  - Docker Image = Class
+  - Container = instance
+
+You can run many containers from a single image. Docker containers are immutable. Any change you made will be lost forever.
+
+```bash
+docker run -it alpine sh
+cd /home
+touch foobar.txt
+exit # file is gone forever
+```
+
+If we open two different terminals, and type `docker run -it alpine sh` in both of them, this two containers will be independent and will not effect each others. When you create a file in one of them, the other container will not be able to see it.
+
+## Downloading and Storing Docker Images
+---------------------------------------------
+
+DockerHub is a docker registry. It's a place where you can store your images. It's like Github, but for docker images.
+
+```bash
+docker run docker.io/library/hello-world
+```
+
+## Explaining the Docker Build Process
+-------------------------------------------
+
+There are 2 ways to build a docker image:
+
+1. `docker commit` command.
+2. Dockerfile
+
+Most of the time we prefer to use `Dockerfile`. Docker images are composed one or more layers. Try to think of each layer as self contained files, and a docker image is the result of stacking together one or more of this layers.
+
+![docker-images](images/ch5-docker-images.png)
+
+Docker only pulls parts that has changed. So, when we update our docker image, it will not download everything from scratch, it will only download changed parts. The same exists when it comes to generating docker images.
+
+# Docker in the Real World
+
+## Creating a Dockerfile (Part 1)
 --------------------------------------
 
 Docker images are basically stack of layers and Dockerfile is just a recipe.
@@ -35,9 +251,6 @@ COPY Gemfile Gemfile.lock /app
 RUN bundle install --jobs 4 --retry 3
 COPY . .
 ```
-
-## 6.4. Creating a Dockerfile (Part 2)
---------------------------------------
 
 Docker caches every layer. So it makes sense to copy `Gemfile` and `Gemfile.lock` before copying entire project folder. Otherwise if we configure our project like this:
 
@@ -84,7 +297,7 @@ LABEL maintainer="M. Serhat Dundar <msdundar@babbel.com>" \
 CMD bundle exec rails server -b "0.0.0.0" -p 3000
 ```
 
-## 6.5. Building and pushing Docker images
+## Building and pushing Docker images
 ------------------------------------------
 
 Get help:
@@ -155,7 +368,7 @@ Pull the image from docker hub:
 docker pull msdundar/deeplinks_resolver
 ```
 
-## 6.6. Running Docker containers
+## Running Docker containers
 ---------------------------------
 
 List all running containers:
@@ -248,7 +461,7 @@ docker container run -it -p 3000:3000 --restart on-failure --name my_container_1
 
 > We can't use `-rm` and `--restart` flags together.
 
-## 6.7. Live code loading with volumes
+## Live code loading with volumes
 --------------------------------------
 
 To follow code changes directly in our container we can use volumes. To be able to use volumes with our container `-v` flag comes into play.
@@ -259,7 +472,7 @@ docker container run -it -p 3001:3001 --rm --name my_container_2 -d -v "$PWD:/ap
 
 This will take everything from our working directory to the running container. It's also possible to pass multiple volume commands.
 
-## 6.8. Debugging tips and tricks
+## Debugging tips and tricks
 ---------------------------------
 
 Interact with a running container:
@@ -288,7 +501,7 @@ docker container exec -it my_container_1 --user "$(id -u):$(id -g)" touch foo.tx
 
 `id -u` will get user ID. `id -g` will get group id.
 
-## 6.9. Linking containers with Docker networks
+## Linking containers with Docker networks
 -----------------------------------------------
 
 Lets create another image:
@@ -359,7 +572,7 @@ Lets try pinging our redis server from deeplinks_resolver:
 docker exec deeplinks_resolver ping redis
 ```
 
-## 6.10. Persisting data to your Docker host
+## Persisting data to your Docker host
 --------------------------------------------
 
 We will lose data generated by our app when we stop the container. We can create named volumes to persist data, and use container with databases etc.
@@ -390,8 +603,7 @@ docker container run --rm -itd -p 3000:3000 --name deeplinks_resolver --net firs
 
 Normally containers supposed to be stateless and portable! Therefore we shouldn't be storing anything in our container. But databases are an exception to this.
 
-
-## 6.11. Sharing data between containers
+## Sharing data between containers
 ----------------------------------------
 
 We can expose any folder as a volume like this:
@@ -421,7 +633,7 @@ ls /app/public
 
 > You can see the changes immediately in volumes!
 
-## 6.12. Optimizing your Docker images
+## Optimizing your Docker images
 --------------------------------------
 
 If we have a `.dockerignore` file exists, during `COPY/ADD` instructions, Docker is going to remove files matching pattern defined in this file. If we have `WORKDIR` set, ignoring will start from this folder.
@@ -462,7 +674,7 @@ VOLUME ["/app/public"]
 CMD flask run --host=0.0.0.0 --port=5000
 ```
 
-## 6.13. Running scripts when a container starts
+## Running scripts when a container starts
 ------------------------------------------------
 
 `ENTRYPOINT [""]` declaration allows you to run a script, after your docker container starts.
@@ -497,7 +709,7 @@ Default `ENTRYPOINT` for `alpine` image is `/bin/sh -c`. We are overriding this 
 
 etc. like tasks that has to be run after we start the container.
 
-## 6.14. Cleaning up after yourself
+## Cleaning up after yourself
 -----------------------------------
 
 Show general status of Docker on your system:
