@@ -226,7 +226,7 @@ Docker only pulls parts that has changed. So, when we update our docker image, i
 
 # Docker in the Real World
 
-## Creating a Dockerfile (Part 1)
+## Creating a Dockerfile
 --------------------------------------
 
 Docker images are basically stack of layers and Dockerfile is just a recipe.
